@@ -6,12 +6,14 @@
 		<link href="./styles/bootstrap.min.css" rel="stylesheet" type="text/css">
 		<style>
 			@import url(https://fonts.googleapis.com/css?family=Lato:300italic,700italic,300,700);
+
 			body {
 				font-family: 'Lato';
 				background-color: #f0f0f0;
 				margin: 0px auto;
 				max-width: 1150px;
 			}
+
 			#overlay {
 				position: absolute;
 				top: 0px;
@@ -22,6 +24,7 @@
 				-ms-filter : fliph; /*IE*/
 				filter : fliph; /*IE*/
 			}
+
 			#videoel {
 				-o-transform : scaleX(-1);
 				-webkit-transform : scaleX(-1);
@@ -29,30 +32,37 @@
 				-ms-filter : fliph; /*IE*/
 				filter : fliph; /*IE*/
 			}
+
 			#container {
 				position : relative;
 				width : 370px;
 				/*margin : 0px auto;*/
 			}
+
 			#content {
 				margin-top : 70px;
 				margin-left : 100px;
 				margin-right : 100px;
 				max-width: 950px;
 			}
+
 			h2 {
 				font-weight : 400;
 			}
+
 			.nogum {
 				display : none;
 			}
+
 			.btn {
 				font-family: 'Lato';
 				font-size: 16px;
 			}
+
 			.hide {
 				display : none;
 			}
+
 			.nohide {
 				display : block;
 			}
@@ -61,28 +71,30 @@
 			// getUserMedia only works over https in Chrome 47+, so we redirect to https. Also notify user if running from file.
 			if (window.location.protocol == "file:") {
 				alert("You seem to be running this example directly from a file. Note that these examples only work when served from a server or localhost due to canvas cross-domain restrictions.");
-			} 
-			// ** commented out for development **
-			// else if (window.location.hostname !== "localhost" && window.location.protocol !== "https:"){
+			}
+			// } else if (window.location.hostname !== "localhost" && window.location.protocol !== "https:"){
 			// 	window.location.protocol = "https";
 			// }
 		</script>
 		<script type="text/javascript">
+
 			var _gaq = _gaq || [];
 			_gaq.push(['_setAccount', 'UA-32642923-1']);
 			_gaq.push(['_trackPageview']);
+
 			(function() {
 				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
 				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 			})();
+
 		</script>
 	</head>
 	<body>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
 		<script src="./js/libs/utils.js"></script>
 		<script src="../build/clmtrackr.js"></script>
 		<script src="./js/libs/Stats.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
 		<div id="content">
 			<h2>Facetracking example</h2>
 			<div id="container">
@@ -120,37 +132,34 @@
 				var vid_width = vid.width;
 				var vid_height = vid.height;
 				var overlay = document.getElementById('overlay');
-
 				var overlayCC = overlay.getContext('2d');
 
-				//setup PIXI
+				// setup PIXI
 				let app = new PIXI.Application({ 
 						view: overlay,
-						width: vid.width,
-						height: vid.height,
+						width: vid_width,
+						height: vid_height,
+						antialias: true,    // default: false
 						transparent: true, // default: false
-						forceCanvas: true // because webGL is not working in my browser 
 					}
 				);
 
-				// Top lip pixi graphic object
-				const topLip = new PIXI.Graphics();
-				app.stage.addChild(topLip);
-				// Bottom lip pixi graphic object
-				const bottomLip = new PIXI.Graphics();
-				app.stage.addChild(bottomLip);
-
-				// top lip coords
-				const topLipIndices = [45, 46, 47, 48, 49, 50, 59, 60, 61];
-				// bottom lip coords
-				const bottomLipIndices = [56, 57, 58, 50, 51, 52, 53, 54, 55];
+				let graphic = new PIXI.Graphics();
+				app.stage.addChild(graphic);
+				graphic.lineStyle('0xFF0000');
+				graphic.beginFill('0xFF0000');
+				graphic.drawCircle(0, 0, 150);
+				graphic.endFill();
+				
 
 				/*********** Setup of video/webcam and checking for webGL support *********/
+
 				function enablestart() {
 					var startbutton = document.getElementById('startbutton');
 					startbutton.value = "start";
 					startbutton.disabled = null;
 				}
+
 				var insertAltVideo = function(video) {
 					// insert alternate video if getUserMedia not available
 					if (supports_video()) {
@@ -164,6 +173,7 @@
 						return true;
 					} else return false;
 				}
+
 				function adjustVideoProportions() {
 					// resize overlay and video if proportions of video are not 4:3
 					// keep same height, just change width
@@ -172,6 +182,7 @@
 					vid.width = vid_width;
 					overlay.width = vid_width;
 				}
+
 				function gumSuccess( stream ) {
 					// add camera stream if getUserMedia succeeded
 					if ("srcObject" in vid) {
@@ -192,6 +203,7 @@
 						}
 					}
 				}
+
 				function gumFail() {
 					// fall back to video if getUserMedia failed
 					insertAltVideo(vid);
@@ -199,8 +211,10 @@
 					document.getElementById('nogum').className = "nohide";
 					alert("There was some problem trying to fetch video from your webcam, using a fallback video instead.");
 				}
+
 				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 				window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
+
 				// set up video
 				if (navigator.mediaDevices) {
 					navigator.mediaDevices.getUserMedia({video : true}).then(gumSuccess).catch(gumFail);
@@ -212,12 +226,15 @@
 					document.getElementById('nogum').className = "nohide";
 					alert("Your browser does not seem to support getUserMedia, using a fallback video instead.");
 				}
+
 				vid.addEventListener('canplay', enablestart, false);
 
 				/*********** Code for face tracking *********/
+
 				var ctrack = new clm.tracker();
 				ctrack.init();
 				var trackingStarted = false;
+
 				function startVideo() {
 					// start video
 					vid.play();
@@ -225,61 +242,31 @@
 					ctrack.start(vid);
 					trackingStarted = true;
 					// start loop to draw face
-					//drawLoop();
-
-					// start loop to draw lips
-					drawLipsLoop();
+					drawLoop();
 				}
-				function drawLipsLoop() {
-					requestAnimFrame(drawLipsLoop);
-					// clear lip graphics for re-render
-					topLip.clear();
-					bottomLip.clear();
-					
-					// get clmtrackr face coordinate positions
-					let positions = ctrack.getCurrentPosition();
-					
-					if (positions) {
-						// Draw top lip
-						topLip.lineStyle(1, 0xFF0000, 0.6);
-						topLip.beginFill(0xFF0000, 0.6);
-						topLip.moveTo(positions[44][0], positions[44][1]);
-						topLipIndices.forEach((coords) => {
-							topLip.lineTo(positions[coords][0], positions[coords][1]);
-						});
-						topLip.closePath();
 
-						// Draw bottom lip
-						bottomLip.lineStyle(1, 0xFF0000, 0.6);
-						bottomLip.beginFill(0xFF0000, 0.6);
-						bottomLip.moveTo(positions[44][0], positions[44][1]);
-						bottomLipIndices.forEach((coords) => {
-							bottomLip.lineTo(positions[coords][0], positions[coords][1]);
-						});
-						bottomLip.closePath();	
-					}
-				}
-				
 				function drawLoop() {
 					requestAnimFrame(drawLoop);
-
 					overlayCC.clearRect(0, 0, vid_width, vid_height);
 					//psrElement.innerHTML = "score :" + ctrack.getScore().toFixed(4);
-					let positions = false;
-					ctrack.getCurrentPosition();
 					if (ctrack.getCurrentPosition()) {
 						ctrack.draw(overlay);
 					}
+					//graphic.drawCircle(0, 0, 100);
 				}
+
 				/*********** Code for stats **********/
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				document.getElementById('container').appendChild( stats.domElement );
+
 				// update stats on every iteration
 				document.addEventListener('clmtrackrIteration', function(event) {
 					stats.update();
 				}, false);
+
 			</script>
 		</div>
 	</body>

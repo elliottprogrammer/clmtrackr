@@ -121,7 +121,7 @@
 				var vid_height = vid.height;
 				var overlay = document.getElementById('overlay');
 
-				var overlayCC = overlay.getContext('2d');
+				//var overlayCC = overlay.getContext('2d');
 
 				//setup PIXI
 				let app = new PIXI.Application({ 
@@ -129,7 +129,6 @@
 						width: vid.width,
 						height: vid.height,
 						transparent: true, // default: false
-						forceCanvas: true // because webGL is not working in my browser 
 					}
 				);
 
